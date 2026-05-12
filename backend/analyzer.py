@@ -1,5 +1,6 @@
 import re
 from urllib.parse import urlparse
+from threat_api import check_virustotal
 
 SUSPICIOUS_KEYWORDS = [
     "urgent", "immediately", "verify", "suspended", "locked",
@@ -58,6 +59,7 @@ def analyze_single_url(url):
             "score": 100,
             "level": "HIGH RISK",
             "red_flags": ["Invalid or malformed URL"],
+            "explanation": "This URL could not be parsed correctly.",
             "recommendation": "Do not open this link."
         }
 
@@ -88,12 +90,34 @@ def analyze_single_url(url):
         score += 35
         flags.append(f"Possible brand impersonation: {', '.join(brand_hits)}")
 
-    suspicious_words = ["login", "verify", "secure", "account", "update", "support", "billing"]
+    suspicious_words = [
+        "login", "verify", "secure", "account",
+        "update", "support", "billing"
+    ]
+
     found_words = [word for word in suspicious_words if word in domain]
 
     if found_words:
         score += len(found_words) * 8
         flags.append(f"Sensitive action words in domain: {', '.join(found_words)}")
+
+    # VirusTotal live threat intelligence check
+    vt_result = check_virustotal(url)
+
+    if isinstance(vt_result, dict) and "vt_malicious" in vt_result:
+        malicious = vt_result.get("vt_malicious", 0)
+        suspicious = vt_result.get("vt_suspicious", 0)
+
+        if malicious > 0:
+            score += malicious * 10
+            flags.append(f"VirusTotal detected {malicious} malicious engines")
+
+        if suspicious > 0:
+            score += suspicious * 5
+            flags.append(f"VirusTotal detected {suspicious} suspicious engines")
+
+    elif isinstance(vt_result, dict) and "vt_error" in vt_result:
+        flags.append(f"VirusTotal check unavailable: {vt_result['vt_error']}")
 
     score = min(score, 100)
 
@@ -108,12 +132,15 @@ def analyze_single_url(url):
         recommendation = "No strong suspicious URL patterns detected."
 
     return {
+        "mode": "URL_ANALYSIS",
         "url": url,
         "domain": domain,
         "score": score,
         "level": level,
         "red_flags": flags if flags else ["No strong URL red flags detected"],
-        "recommendation": recommendation
+        "explanation": generate_url_explanation(level, domain),
+        "recommendation": recommendation,
+        "virustotal": vt_result
     }
 
 
@@ -122,6 +149,7 @@ def analyze_urls(urls):
 
     for url in urls:
         result = analyze_single_url(url)
+
         for flag in result["red_flags"]:
             if "No strong" not in flag:
                 findings.append(flag)
@@ -188,25 +216,23 @@ def analyze_text(text):
         "score": score,
         "level": level,
         "red_flags": red_flags if red_flags else ["No strong red flags detected"],
-        "explanation": generate_explanation(level),
+        "explanation": generate_text_explanation(level),
         "recommendation": recommendation,
         "urls_found": urls
     }
 
 
 def analyze_input(text):
-    urls = extract_urls(text.strip())
+    text = text.strip()
+    urls = extract_urls(text)
 
-    if len(urls) == 1 and text.strip() == urls[0]:
-        result = analyze_single_url(urls[0])
-        result["mode"] = "URL_ANALYSIS"
-        result["explanation"] = generate_url_explanation(result["level"], result["domain"])
-        return result
+    if len(urls) == 1 and text == urls[0]:
+        return analyze_single_url(urls[0])
 
     return analyze_text(text)
 
 
-def generate_explanation(level):
+def generate_text_explanation(level):
     if level == "HIGH RISK":
         return "This message shows multiple phishing indicators such as urgency, suspicious wording, credential-related language, or risky links."
     elif level == "SUSPICIOUS":
