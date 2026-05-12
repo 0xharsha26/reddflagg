@@ -33,8 +33,19 @@
       resize: vertical;
     }
 
+    input[type="file"] {
+      margin-top: 15px;
+      background: #15151c;
+      color: white;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 12px;
+      width: 100%;
+    }
+
     button {
       margin-top: 15px;
+      margin-right: 10px;
       background: #ff2b2b;
       color: white;
       border: none;
@@ -89,19 +100,38 @@
       color: #777;
       margin-bottom: 30px;
     }
+
+    .preview {
+      white-space: pre-wrap;
+      background: #0d0d12;
+      border: 1px solid #333;
+      padding: 15px;
+      border-radius: 10px;
+      color: #ccc;
+      max-height: 180px;
+      overflow-y: auto;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h1>REDDFLAGG</h1>
-    <p class="brand">AI-style threat analysis for suspicious emails, links, and messages.</p>
+    <p class="brand">Threat analysis for suspicious emails, links, messages, and screenshots.</p>
 
-    <textarea id="inputText" placeholder="Paste suspicious email, SMS, or message here..."></textarea>
+    <textarea id="inputText" placeholder="Paste suspicious email, SMS, URL, or message here..."></textarea>
     <br>
-    <button onclick="analyzeThreat()">Analyze Threat</button>
+
+    <button onclick="analyzeThreat()">Analyze Text / URL</button>
+
+    <div class="label">Or upload a screenshot/image</div>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="analyzeImage()">Analyze Image</button>
 
     <div id="result" class="result">
+      <div class="label">Analysis Mode</div>
+      <p id="mode"></p>
+
       <div class="label">Threat Level</div>
       <div id="level" class="score"></div>
 
@@ -116,6 +146,11 @@
 
       <div class="label">Recommendation</div>
       <p id="recommendation"></p>
+
+      <div id="extractedBox" style="display:none;">
+        <div class="label">Extracted Text from Image</div>
+        <div id="extractedText" class="preview"></div>
+      </div>
     </div>
   </div>
 
@@ -132,7 +167,31 @@
       });
 
       const data = await response.json();
+      renderResult(data);
+    }
 
+    async function analyzeImage() {
+      const fileInput = document.getElementById("imageInput");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Please select an image first");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("http://127.0.0.1:8000/analyze-image", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      renderResult(data);
+    }
+
+    function renderResult(data) {
       if (data.error) {
         alert(data.error);
         return;
@@ -141,9 +200,10 @@
       const resultBox = document.getElementById("result");
       resultBox.style.display = "block";
 
+      document.getElementById("mode").innerText = data.mode || "TEXT_ANALYSIS";
+
       const level = document.getElementById("level");
       level.innerText = data.level;
-
       level.className = "score";
 
       if (data.level === "HIGH RISK") {
@@ -166,6 +226,17 @@
         li.innerText = flag;
         flagsList.appendChild(li);
       });
+
+      const extractedBox = document.getElementById("extractedBox");
+      const extractedText = document.getElementById("extractedText");
+
+      if (data.extracted_text) {
+        extractedBox.style.display = "block";
+        extractedText.innerText = data.extracted_text;
+      } else {
+        extractedBox.style.display = "none";
+        extractedText.innerText = "";
+      }
     }
   </script>
 
