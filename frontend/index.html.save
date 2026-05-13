@@ -111,34 +111,21 @@
       max-height: 180px;
       overflow-y: auto;
     }
-
-    .attack-box {
-      margin-top: 20px;
-      background: #0d0d12;
-      border: 1px solid #333;
-      padding: 15px;
-      border-radius: 10px;
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
     <h1>REDDFLAGG</h1>
-    <p class="brand">Threat analysis for suspicious emails, links, messages, screenshots, and QR codes.</p>
+    <p class="brand">Threat analysis for suspicious emails, links, messages, and screenshots.</p>
 
     <textarea id="inputText" placeholder="Paste suspicious email, SMS, URL, or message here..."></textarea>
-    <br>
-
+    <
     <button onclick="analyzeThreat()">Analyze Text / URL</button>
 
     <div class="label">Or upload a screenshot/image</div>
     <input type="file" id="imageInput" accept="image/*">
     <button onclick="analyzeImage()">Analyze Image</button>
-
-    <div class="label">Or upload a QR code</div>
-    <input type="file" id="qrInput" accept="image/*">
-    <button onclick="analyzeQR()">Analyze QR</button>
 
     <div id="result" class="result">
       <div class="label">Analysis Mode</div>
@@ -158,19 +145,6 @@
 
       <div class="label">Recommendation</div>
       <p id="recommendation"></p>
-
-      <div id="attackBox" class="attack-box">
-        <div class="label">Attack Summary</div>
-        <p><b>Attack Type:</b> <span id="attackType"></span></p>
-        <p><b>Attacker Goal:</b> <span id="attackerGoal"></span></p>
-        <p><b>User Risk:</b> <span id="userRisk"></span></p>
-        <p><b>Confidence:</b> <span id="confidence"></span></p>
-      </div>
-
-      <div id="qrBox" style="display:none;">
-        <div class="label">QR Data Extracted</div>
-        <div id="qrData" class="preview"></div>
-      </div>
 
       <div id="extractedBox" style="display:none;">
         <div class="label">Extracted Text from Image</div>
@@ -216,27 +190,6 @@
       renderResult(data);
     }
 
-    async function analyzeQR() {
-      const fileInput = document.getElementById("qrInput");
-      const file = fileInput.files[0];
-
-      if (!file) {
-        alert("Please select a QR image first");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("http://127.0.0.1:8000/analyze-qr", {
-        method: "POST",
-        body: formData
-      });
-
-      const data = await response.json();
-      renderResult(data);
-    }
-
     function renderResult(data) {
       if (data.error) {
         alert(data.error);
@@ -272,24 +225,6 @@
         li.innerText = flag;
         flagsList.appendChild(li);
       });
-
-      if (data.attack_summary) {
-        document.getElementById("attackType").innerText = data.attack_summary.attack_type;
-        document.getElementById("attackerGoal").innerText = data.attack_summary.attacker_goal;
-        document.getElementById("userRisk").innerText = data.attack_summary.user_risk;
-        document.getElementById("confidence").innerText = data.attack_summary.confidence;
-      }
-
-      const qrBox = document.getElementById("qrBox");
-      const qrData = document.getElementById("qrData");
-
-      if (data.qr_data) {
-        qrBox.style.display = "block";
-        qrData.innerText = data.qr_data.join("\n");
-      } else {
-        qrBox.style.display = "none";
-        qrData.innerText = "";
-      }
 
       const extractedBox = document.getElementById("extractedBox");
       const extractedText = document.getElementById("extractedText");

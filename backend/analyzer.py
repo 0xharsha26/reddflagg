@@ -131,6 +131,8 @@ def analyze_single_url(url):
         level = "LOW RISK"
         recommendation = "No strong suspicious URL patterns detected."
 
+    attack_summary = generate_attack_summary(level, flags)
+
     return {
         "mode": "URL_ANALYSIS",
         "url": url,
@@ -139,7 +141,8 @@ def analyze_single_url(url):
         "level": level,
         "red_flags": flags if flags else ["No strong URL red flags detected"],
         "explanation": generate_url_explanation(level, domain),
-        "recommendation": recommendation,
+	"recommendation": recommendation,
+	"attack_summary": attack_summary,
         "virustotal": vt_result
     }
 
@@ -210,7 +213,7 @@ def analyze_text(text):
     else:
         level = "LOW RISK"
         recommendation = "No major phishing indicators detected, but still verify unknown messages."
-
+    attack_summary = generate_attack_summary(level, red_flags)
     return {
         "mode": "TEXT_ANALYSIS",
         "score": score,
@@ -218,7 +221,8 @@ def analyze_text(text):
         "red_flags": red_flags if red_flags else ["No strong red flags detected"],
         "explanation": generate_text_explanation(level),
         "recommendation": recommendation,
-        "urls_found": urls
+        "attack_summary": attack_summary,
+	"urls_found": urls
     }
 
 
@@ -234,17 +238,76 @@ def analyze_input(text):
 
 def generate_text_explanation(level):
     if level == "HIGH RISK":
-        return "This message shows multiple phishing indicators such as urgency, suspicious wording, credential-related language, or risky links."
+        return (
+            "This message shows strong phishing behavior. It uses pressure tactics, "
+            "credential-related wording, or suspicious links to push the user into taking action quickly."
+        )
     elif level == "SUSPICIOUS":
-        return "This message contains some warning signs. It may not be confirmed phishing, but it should be treated carefully."
+        return (
+            "This message contains some warning signs. It may be attempting to build trust, "
+            "create urgency, or redirect the user to an unsafe action."
+        )
     else:
-        return "This message does not show strong phishing patterns based on the current analysis."
-
+        return (
+            "This message does not show strong phishing behavior in the current rule-based analysis. "
+            "Still verify unknown senders before clicking links."
+        )
 
 def generate_url_explanation(level, domain):
     if level == "HIGH RISK":
-        return f"The domain {domain} shows multiple suspicious URL patterns commonly used in phishing or impersonation attempts."
+        return (
+            f"{domain} shows multiple signs commonly seen in phishing infrastructure. "
+            "The domain structure, naming pattern, or live reputation data suggests it may be used "
+            "for impersonation, credential theft, or unsafe redirection."
+        )
     elif level == "SUSPICIOUS":
-        return f"The domain {domain} contains some warning signs and should be verified before opening."
+        return (
+            f"{domain} has some suspicious characteristics. It may be harmless, but the domain should be "
+            "verified manually before opening, especially if it was received through email, SMS, or QR code."
+        )
     else:
-        return f"The domain {domain} does not show strong suspicious URL patterns in this basic analysis."
+        return (
+            f"{domain} does not show strong suspicious URL patterns in this scan. "
+            "However, reputation can change, so unknown links should still be handled carefully."
+        )
+
+def generate_attack_summary(level, red_flags):
+    flags_text = " ".join(red_flags).lower()
+
+    attack_type = "Unknown / Low-confidence threat"
+    attacker_goal = "No clear malicious goal detected"
+    user_risk = "Low immediate risk"
+
+    if "brand impersonation" in flags_text:
+        attack_type = "Brand impersonation phishing"
+        attacker_goal = "Trick the user into trusting a fake brand page"
+        user_risk = "Credential theft, account takeover, or financial fraud"
+
+    if "password" in flags_text or "otp" in flags_text or "credential" in flags_text:
+        attack_type = "Credential harvesting attempt"
+        attacker_goal = "Steal login credentials, OTPs, or account recovery details"
+        user_risk = "Account compromise or identity misuse"
+
+    if "virustotal detected" in flags_text:
+        attack_type = "Known malicious or suspicious URL"
+        attacker_goal = "Redirect the user to previously reported malicious infrastructure"
+        user_risk = "Malware exposure, phishing, or unsafe redirection"
+
+    if "urgency" in flags_text or "panic" in flags_text:
+        attacker_goal = "Pressure the user into acting quickly without verifying"
+
+    if level == "HIGH RISK":
+        confidence = "High"
+    elif level == "SUSPICIOUS":
+        confidence = "Medium"
+    else:
+        confidence = "Low"
+
+    return {
+        "attack_type": attack_type,
+        "attacker_goal": attacker_goal,
+        "user_risk": user_risk,
+        "confidence": confidence
+    }
+
+
