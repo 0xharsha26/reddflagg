@@ -1,0 +1,26 @@
+[
+  {
+    "timestamp": "2026-05-14 00:28:10",
+    "input": "https://paypal-login-security.xyz",
+    "mode": "QR_ANALYSIS",
+    "score": 83,
+    "level": "HIGH RISK",
+    "explanation": "paypal-login-security.xyz shows multiple signs commonly seen in phishing infrastructure. The domain structure, naming pattern, or live reputation data suggests it may be used for impersonation, credential theft, or unsafe redirection."
+  },
+  {
+    "timestamp": "2026-05-14 00:27:55",
+    "input": "IMAGE_UPLOAD",
+    "mode": "IMAGE_ANALYSIS",
+    "score": 100,
+    "level": "HIGH RISK",
+    "explanation": "This message shows strong phishing behavior. It uses pressure tactics, credential-related wording, or suspicious links to push the user into taking action quickly."
+  },
+  {
+    "timestamp": "2026-05-14 00:27:20",
+    "input": "https://paypal-login-security.xyz",
+    "mode": "URL_ANALYSIS",
+    "score": 83,
+    "level": "HIGH RISK",
+    "explanation": "paypal-login-security.xyz shows multiple signs commonly seen in phishing infrastructure. The domain structure, naming pattern, or live reputation data suggests it may be used for impersonation, credential theft, or unsafe redirection."
+  }
+]

@@ -12,7 +12,7 @@
     }
 
     .container {
-      max-width: 850px;
+      max-width: 900px;
       margin: auto;
     }
 
@@ -60,12 +60,15 @@
       background: #d91f1f;
     }
 
-    .result {
+    .result, .history {
       margin-top: 25px;
       background: #15151c;
       border: 1px solid #292933;
       border-radius: 16px;
       padding: 22px;
+    }
+
+    .result {
       display: none;
     }
 
@@ -118,6 +121,42 @@
       border: 1px solid #333;
       padding: 15px;
       border-radius: 10px;
+    }
+
+    .history-item {
+      background: #0d0d12;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 12px;
+    }
+
+    .history-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .history-level {
+      font-weight: bold;
+    }
+
+    .history-input {
+      color: #ccc;
+      word-break: break-word;
+      margin-top: 8px;
+    }
+
+    .history-meta {
+      color: #777;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .section-title {
+      margin-top: 35px;
+      color: #ff2b2b;
     }
   </style>
 </head>
@@ -177,6 +216,13 @@
         <div id="extractedText" class="preview"></div>
       </div>
     </div>
+
+    <h2 class="section-title">Scan History</h2>
+    <button onclick="loadHistory()">Refresh History</button>
+
+    <div id="history" class="history">
+      <p class="brand">No scan history loaded yet.</p>
+    </div>
   </div>
 
   <script>
@@ -193,6 +239,7 @@
 
       const data = await response.json();
       renderResult(data);
+      loadHistory();
     }
 
     async function analyzeImage() {
@@ -214,6 +261,7 @@
 
       const data = await response.json();
       renderResult(data);
+      loadHistory();
     }
 
     async function analyzeQR() {
@@ -235,6 +283,7 @@
 
       const data = await response.json();
       renderResult(data);
+      loadHistory();
     }
 
     function renderResult(data) {
@@ -302,6 +351,51 @@
         extractedText.innerText = "";
       }
     }
+
+    async function loadHistory() {
+      const response = await fetch("http://127.0.0.1:8000/history");
+      const history = await response.json();
+
+      const historyBox = document.getElementById("history");
+      historyBox.innerHTML = "";
+
+      if (!history.length) {
+        historyBox.innerHTML = "<p class='brand'>No scans yet.</p>";
+        return;
+      }
+
+      history.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        let levelClass = "low";
+
+        if (item.level === "HIGH RISK") {
+          levelClass = "high";
+        } else if (item.level === "SUSPICIOUS") {
+          levelClass = "suspicious";
+        }
+
+        div.innerHTML = `
+          <div class="history-top">
+            <span class="history-level ${levelClass}">${item.level}</span>
+            <span>${item.score}/100</span>
+          </div>
+
+          <div class="history-input">${item.input}</div>
+
+          <div class="history-meta">
+            ${item.mode} • ${item.timestamp}
+          </div>
+
+          <p>${item.explanation}</p>
+        `;
+
+        historyBox.appendChild(div);
+      });
+    }
+
+    loadHistory();
   </script>
 
 </body>
