@@ -1,623 +1,748 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>REDDFLAGG</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0b0f;
-      color: white;
-      padding: 40px;
-    }
+<title>REDDFLAGG</title>
 
-    .container {
-      max-width: 1000px;
-      margin: auto;
-    }
+<link
+  rel="icon"
+  type="image/png"
+  href="favicon.ico"
+/>
 
-    h1 {
-      color: #ff2b2b;
-      letter-spacing: 2px;
-    }
+<style>
 
-    .brand {
-      color: #777;
-      margin-bottom: 30px;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    textarea {
-      width: 100%;
-      height: 180px;
-      background: #15151c;
-      color: white;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 15px;
-      font-size: 15px;
-      resize: vertical;
-    }
+body{
+  background:#07070a;
+  color:white;
+  font-family:Arial, sans-serif;
+  padding:20px;
+}
 
-    input[type="file"] {
-      margin-top: 15px;
-      background: #15151c;
-      color: white;
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 12px;
-      width: 100%;
-    }
+.container{
+  max-width:1100px;
+  margin:auto;
+}
 
-    button {
-      margin-top: 15px;
-      margin-right: 10px;
-      background: #ff2b2b;
-      color: white;
-      border: none;
-      padding: 14px 22px;
-      border-radius: 10px;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+.brand{
+  color:#ff1717;
+}
 
-    button:hover {
-      background: #d91f1f;
-    }
+.card{
+  background:#12172c;
+  border-radius:18px;
+  padding:20px;
+  margin-top:20px;
+  border:1px solid rgba(255,255,255,0.08);
+}
 
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
-      margin-bottom: 35px;
-    }
+textarea{
+  width:100%;
+  min-height:140px;
+  background:#202836;
+  border:none;
+  color:white;
+  padding:15px;
+  border-radius:12px;
+  resize:none;
+  margin-top:15px;
+}
 
-    .stat-card {
-      background: #15151c;
-      border: 1px solid #292933;
-      border-radius: 16px;
-      padding: 20px;
-    }
+button{
+  padding:12px 18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  margin-top:15px;
+  font-weight:bold;
+}
 
-    .stat-title {
-      color: #888;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
+.primary-btn{
+  background:#ff1717;
+  color:white;
+}
 
-    .stat-value {
-      font-size: 36px;
-      font-weight: bold;
-    }
+.secondary-btn{
+  background:#491111;
+  color:#ff1717;
+}
 
-    .high {
-      color: #ff2b2b;
-    }
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:15px;
+  margin-top:20px;
+}
 
-    .suspicious {
-      color: #ffb020;
-    }
+.stat-box{
+  background:#1e2941;
+  padding:18px;
+  border-radius:14px;
+}
 
-    .low {
-      color: #38d66b;
-    }
+.stat-title{
+  opacity:0.7;
+  font-size:14px;
+}
 
-    .section-title {
-      color: #ff2b2b;
-      margin-top: 40px;
-    }
+.stat-value{
+  font-size:30px;
+  margin-top:8px;
+  font-weight:bold;
+}
 
-    .result, .history, .activity-box {
-      margin-top: 25px;
-      background: #15151c;
-      border: 1px solid #292933;
-      border-radius: 16px;
-      padding: 22px;
-    }
+.result{
+  margin-top:20px;
+}
 
-    .result {
-      display: none;
-    }
+.result-level{
+  font-size:28px;
+  font-weight:bold;
+}
 
-    .score {
-      font-size: 32px;
-      font-weight: bold;
-    }
+.high{
+  color:#d32444;
+}
 
-    .label {
-      color: #aaa;
-      font-size: 14px;
-      margin-top: 20px;
-    }
+.suspicious{
+  color:#fcc64a;
+}
 
-    .preview {
-      white-space: pre-wrap;
-      background: #0d0d12;
-      border: 1px solid #333;
-      padding: 15px;
-      border-radius: 10px;
-      color: #ccc;
-      max-height: 180px;
-      overflow-y: auto;
-    }
+.low{
+  color:#2ed46b;
+}
 
-    .attack-box {
-      margin-top: 20px;
-      background: #0d0d12;
-      border: 1px solid #333;
-      padding: 15px;
-      border-radius: 10px;
-    }
+.flag{
+  background:#0f172a;
+  padding:10px;
+  border-radius:10px;
+  margin-top:10px;
+}
 
-    .history-item {
-      background: #0d0d12;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 15px;
-      margin-top: 12px;
-    }
+.history-item{
+  background:#0f172a;
+  padding:15px;
+  border-radius:12px;
+  margin-top:12px;
+}
 
-    .history-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-    }
+.history-top{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
 
-    .history-level {
-      font-weight: bold;
-    }
+.history-level{
+  font-weight:bold;
+}
 
-    .history-input {
-      color: #ccc;
-      word-break: break-word;
-      margin-top: 8px;
-    }
+.history-input{
+  margin-top:10px;
+  word-break:break-word;
+}
 
-    .history-meta {
-      color: #777;
-      font-size: 13px;
-      margin-top: 8px;
-    }
+.history-meta{
+  opacity:0.7;
+  margin-top:10px;
+  font-size:14px;
+}
 
-    .activity-box {
-      margin-bottom: 30px;
-    }
+.connection{
+  margin-top:10px;
+  font-size:14px;
+}
 
-    .activity-item {
-      margin-top: 10px;
-      color: #ccc;
-      word-break: break-word;
-    }
+.connected{
+  color:#4ade80;
+}
 
-    li {
-      margin-bottom: 8px;
-    }
-  </style>
+.offline{
+  color:#d32444;
+}
+
+.loading{
+  opacity:0.7;
+  margin-top:10px;
+}
+
+.upload-box{
+  margin-top:15px;
+}
+
+input[type="file"]{
+  margin-top:10px;
+}
+
+.action-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <h1>REDDFLAGG</h1>
+<h1>
+<span class="brand">REDD</span>FLAGG
+</h1>
 
-    <p class="brand">
-      AI-native threat intelligence platform for phishing, URLs, screenshots, and QR attacks.
-    </p>
+<div id="connectionStatus" class="connection">
+Checking backend...
+</div>
 
-    <h2 class="section-title">Threat Analytics</h2>
+<div class="card">
 
-    <div class="dashboard-grid">
+<h2>Threat Analyzer</h2>
 
-      <div class="stat-card">
-        <div class="stat-title">Total Scans</div>
-        <div id="totalScans" class="stat-value">0</div>
-      </div>
+<textarea
+id="inputText"
+placeholder="Paste suspicious message, email, URL, or phishing text..."
+></textarea>
 
-      <div class="stat-card">
-        <div class="stat-title">High Risk</div>
-        <div id="highRisk" class="stat-value high">0</div>
-      </div>
+<div class="action-row">
 
-      <div class="stat-card">
-        <div class="stat-title">Suspicious</div>
-        <div id="suspicious" class="stat-value suspicious">0</div>
-      </div>
+<button
+class="primary-btn"
+onclick="analyzeText()"
+>
+Analyze
+</button>
 
-      <div class="stat-card">
-        <div class="stat-title">Low Risk</div>
-        <div id="lowRisk" class="stat-value low">0</div>
-      </div>
+<button
+class="secondary-btn"
+id="refreshBtn"
+onclick="refreshAnalytics()"
+>
+Reset Analytics
+</button>
 
-    </div>
+</div>
 
-    <div class="activity-box">
-      <h3>Latest Threat Activity</h3>
-      <div id="latestActivity" class="activity-item">No scans yet.</div>
-    </div>
+<div class="upload-box">
 
-    <textarea
-      id="inputText"
-      placeholder="Paste suspicious email, SMS, URL, or message here..."
-    ></textarea>
+<h3 style="margin-top:20px;">
+Image Analysis
+</h3>
 
-    <br>
+<input
+type="file"
+id="imageUpload"
+accept="image/*"
+/>
 
-    <button onclick="analyzeThreat()">Analyze Text / URL</button>
+<button
+class="secondary-btn"
+onclick="analyzeImage()"
+>
+Analyze Image
+</button>
 
-    <div class="label">Or upload a screenshot/image</div>
-    <input type="file" id="imageInput" accept="image/*">
-    <button onclick="analyzeImage()">Analyze Image</button>
+</div>
 
-    <div class="label">Or upload a QR code</div>
-    <input type="file" id="qrInput" accept="image/*">
-    <button onclick="analyzeQR()">Analyze QR</button>
+<div class="upload-box">
 
-    <div id="result" class="result">
+<h3 style="margin-top:20px;">
+QR Analysis
+</h3>
 
-      <div class="label">Analysis Mode</div>
-      <p id="mode"></p>
+<input
+type="file"
+id="qrUpload"
+accept="image/*"
+/>
 
-      <div class="label">Threat Level</div>
-      <div id="level" class="score"></div>
+<button
+class="secondary-btn"
+onclick="analyzeQR()"
+>
+Analyze QR
+</button>
 
-      <div class="label">Risk Score</div>
-      <p id="score"></p>
+</div>
 
-      <div class="label">Explanation</div>
-      <p id="explanation"></p>
+<div id="loading" class="loading"></div>
 
-      <div class="label">Red Flags</div>
-      <ul id="flags"></ul>
+<div id="result" class="result"></div>
 
-      <div class="label">Recommendation</div>
-      <p id="recommendation"></p>
+</div>
 
-      <div id="attackBox" class="attack-box">
-        <div class="label">Attack Summary</div>
-        <p><b>Attack Type:</b> <span id="attackType"></span></p>
-        <p><b>Attacker Goal:</b> <span id="attackerGoal"></span></p>
-        <p><b>User Risk:</b> <span id="userRisk"></span></p>
-        <p><b>Confidence:</b> <span id="confidence"></span></p>
-      </div>
+<div class="card">
 
-      <div id="domainBox" class="attack-box" style="display:none;">
-        <div class="label">Domain Intelligence</div>
-        <p><b>Domain:</b> <span id="diDomain"></span></p>
-        <p><b>Registrar:</b> <span id="diRegistrar"></span></p>
-        <p><b>Country:</b> <span id="diCountry"></span></p>
-        <p><b>Created:</b> <span id="diCreated"></span></p>
-        <p><b>Expires:</b> <span id="diExpiry"></span></p>
-        <p><b>Domain Age:</b> <span id="diAge"></span></p>
-      </div>
+<h2>Analytics</h2>
 
-      <div id="qrBox" style="display:none;">
-        <div class="label">QR Data Extracted</div>
-        <div id="qrData" class="preview"></div>
-      </div>
+<div class="stats-grid">
 
-      <div id="extractedBox" style="display:none;">
-        <div class="label">Extracted Text from Image</div>
-        <div id="extractedText" class="preview"></div>
-      </div>
+<div class="stat-box">
+<div class="stat-title">Total Scans</div>
+<div class="stat-value" id="totalScans">0</div>
+</div>
 
-    </div>
+<div class="stat-box">
+<div class="stat-title">High Risk</div>
+<div class="stat-value high" id="highRisk">0</div>
+</div>
 
-    <h2 class="section-title">Scan History</h2>
+<div class="stat-box">
+<div class="stat-title">Suspicious</div>
+<div class="stat-value suspicious" id="suspiciousCount">0</div>
+</div>
 
-    <button onclick="loadHistory()">Refresh History</button>
+<div class="stat-box">
+<div class="stat-title">Low Risk</div>
+<div class="stat-value low" id="lowRisk">0</div>
+</div>
 
-    <div id="history" class="history">
-      <p class="brand">No scan history loaded yet.</p>
-    </div>
+</div>
 
-  </div>
+</div>
 
-  <script>
+<div class="card">
 
-    function getApiBase() {
+<h2>Recent Scans</h2>
 
-        const host = window.location.hostname;
-        const origin = window.location.origin;
+<div id="history">
+<p class="brand">Loading history...</p>
+</div>
 
-        // local laptop / termux
-        if (
-            host === "127.0.0.1" ||
-            host === "localhost"
-        ) {
+</div>
 
-            return "http://127.0.0.1:8000";
-        }
+</div>
 
-        // github codespaces
-        if (
-            origin.includes(
-            ".app.github.dev"
-            )
-        ) {
+<script>
 
-            return origin.replace(
-                "-5500",
-                "-8000"
-            );
-        }
+function getApiBase() {
 
-        // fallback
-        return "http://127.0.0.1:8000";
+  const host = window.location.hostname;
+  const origin = window.location.origin;
+
+  if (
+    host === "127.0.0.1" ||
+    host === "localhost"
+  ) {
+    return "http://127.0.0.1:8000";
+  }
+
+  if (
+    origin.includes(".app.github.dev")
+  ) {
+    return origin.replace("-5500", "-8000");
+  }
+
+  return "http://127.0.0.1:8000";
+}
+
+const API_BASE = getApiBase();
+
+async function safeFetch(url, options = {}) {
+
+  try {
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(
+        "Request failed"
+      );
     }
 
-    const API_BASE = getApiBase();
+    return await response.json();
 
-    console.log(
-    "REDDFLAGG backend:",
-    API_BASE
+  } catch (error) {
+
+    console.error(error);
+
+    return null;
+  }
+}
+
+async function checkBackend() {
+
+  const statusBox =
+    document.getElementById(
+      "connectionStatus"
     );
 
-    async function safeFetch(url, options = {}) {
-      try {
-        const response = await fetch(url, options);
+  const data =
+    await safeFetch(
+      API_BASE + "/health"
+    );
 
-        if (!response.ok) {
-          alert("Backend error: " + response.status);
-          return null;
+  if (data) {
+
+    statusBox.innerHTML =
+      "Backend Connected";
+
+    statusBox.className =
+      "connection connected";
+
+  } else {
+
+    statusBox.innerHTML =
+      "Backend Offline";
+
+    statusBox.className =
+      "connection offline";
+  }
+}
+
+function setLoading(text="") {
+
+  document.getElementById(
+    "loading"
+  ).innerText = text;
+}
+
+function renderResult(data) {
+
+  const resultBox =
+    document.getElementById(
+      "result"
+    );
+
+  if (!data) {
+
+    resultBox.innerHTML =
+      "<p class='high'>Analysis failed.</p>";
+
+    return;
+  }
+
+  let levelClass = "low";
+
+  if (data.level === "HIGH RISK") {
+    levelClass = "high";
+  }
+
+  else if (
+    data.level === "SUSPICIOUS"
+  ) {
+    levelClass = "suspicious";
+  }
+
+  let flagsHtml = "";
+
+  if (data.red_flags) {
+
+    data.red_flags.forEach(flag => {
+
+      flagsHtml +=
+        '<div class="flag">' +
+        flag +
+        '</div>';
+    });
+  }
+
+  resultBox.innerHTML =
+
+    '<div class="result-level ' +
+    levelClass +
+    '">' +
+    data.level +
+    '</div>' +
+
+    '<p style="margin-top:10px;">' +
+    'Threat Score: ' +
+    data.score +
+    '/100' +
+    '</p>' +
+
+    '<p style="margin-top:15px;">' +
+    data.explanation +
+    '</p>' +
+
+    '<h3 style="margin-top:20px;">' +
+    'Red Flags' +
+    '</h3>' +
+
+    flagsHtml;
+}
+
+async function analyzeText() {
+
+  const text =
+    document.getElementById(
+      "inputText"
+    ).value.trim();
+
+  if (!text) {
+    alert("Enter some text.");
+    return;
+  }
+
+  setLoading("Analyzing...");
+
+  const data = await safeFetch(
+    API_BASE + "/analyze",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        text:text
+      })
+    }
+  );
+
+  setLoading("");
+
+  renderResult(data);
+
+  await loadStats();
+  await loadHistory();
+}
+
+async function analyzeImage() {
+
+  const file =
+    document.getElementById(
+      "imageUpload"
+    ).files[0];
+
+  if (!file) {
+    alert("Select image.");
+    return;
+  }
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "file",
+    file
+  );
+
+  setLoading(
+    "Scanning image..."
+  );
+
+  const data = await safeFetch(
+    API_BASE + "/analyze-image",
+    {
+      method:"POST",
+      body:formData
+    }
+  );
+
+  setLoading("");
+
+  renderResult(data);
+
+  await loadStats();
+  await loadHistory();
+}
+
+async function analyzeQR() {
+
+  const file =
+    document.getElementById(
+      "qrUpload"
+    ).files[0];
+
+  if (!file) {
+    alert("Select QR image.");
+    return;
+  }
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "file",
+    file
+  );
+
+  setLoading(
+    "Scanning QR..."
+  );
+
+  const data = await safeFetch(
+    API_BASE + "/analyze-qr",
+    {
+      method:"POST",
+      body:formData
+    }
+  );
+
+  setLoading("");
+
+  renderResult(data);
+
+  await loadStats();
+  await loadHistory();
+}
+
+async function loadStats() {
+
+  const stats =
+    await safeFetch(
+      API_BASE + "/stats"
+    );
+
+  if (!stats) return;
+
+  document.getElementById(
+    "totalScans"
+  ).innerText =
+    stats.total_scans || 0;
+
+  document.getElementById(
+    "highRisk"
+  ).innerText =
+    stats.high_risk || 0;
+
+  document.getElementById(
+    "suspiciousCount"
+  ).innerText =
+    stats.suspicious || 0;
+
+  document.getElementById(
+    "lowRisk"
+  ).innerText =
+    stats.low_risk || 0;
+}
+
+async function loadHistory() {
+
+  const history =
+    await safeFetch(
+      API_BASE + "/history"
+    );
+
+  if (!history) return;
+
+  const historyBox =
+    document.getElementById(
+      "history"
+    );
+
+  historyBox.innerHTML = "";
+
+  if (!history.length) {
+
+    historyBox.innerHTML =
+      "<p class='brand'>No scans yet.</p>";
+
+    return;
+  }
+
+  history.forEach(item => {
+
+    let levelClass = "low";
+
+    if (item.level === "HIGH RISK") {
+      levelClass = "high";
+    }
+
+    else if (
+      item.level === "SUSPICIOUS"
+    ) {
+      levelClass = "suspicious";
+    }
+
+    const div =
+      document.createElement("div");
+
+    div.className =
+      "history-item";
+
+    div.innerHTML =
+
+      '<div class="history-top">' +
+
+      '<span class="history-level ' +
+      levelClass +
+      '">' +
+      item.level +
+      '</span>' +
+
+      '<span>' +
+      item.score +
+      '/100</span>' +
+
+      '</div>' +
+
+      '<div class="history-input">' +
+      item.input +
+      '</div>' +
+
+      '<div class="history-meta">' +
+      item.mode +
+      ' | ' +
+      item.timestamp +
+      '</div>' +
+
+      '<p style="margin-top:10px;">' +
+      item.explanation +
+      '</p>';
+
+    historyBox.appendChild(div);
+  });
+}
+
+async function refreshAnalytics() {
+
+  const confirmReset =
+    confirm(
+      "Clear all analytics and history?"
+    );
+
+  if (!confirmReset) return;
+
+  try {
+
+    const response =
+      await fetch(
+        API_BASE + "/history",
+        {
+          method:"DELETE"
         }
+      );
 
-        return await response.json();
-
-      } catch (error) {
-        alert(
-          "Could not reach REDDFLAGG backend.\n\n" +
-          "API tried: " + API_BASE + "\n\n" +
-          "Make sure uvicorn is running on port 8000."
-        );
-
-        return null;
-      }
+    if (!response.ok) {
+      throw new Error(
+        "Reset failed"
+      );
     }
 
-    async function analyzeThreat() {
-      const text = document.getElementById("inputText").value;
+    await loadStats();
+    await loadHistory();
 
-      const data = await safeFetch(API_BASE + "/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ text: text })
-      });
+    document.getElementById(
+      "result"
+    ).innerHTML = "";
 
-      if (!data) return;
+    alert(
+      "Analytics reset successfully."
+    );
 
-      renderResult(data);
-      loadHistory();
-      loadStats();
-    }
+  } catch(error) {
 
-    async function analyzeImage() {
-      const fileInput = document.getElementById("imageInput");
-      const file = fileInput.files[0];
+    console.error(error);
 
-      if (!file) {
-        alert("Please select an image first");
-        return;
-      }
+    alert(
+      "Failed to reset analytics."
+    );
+  }
+}
 
-      const formData = new FormData();
-      formData.append("file", file);
+checkBackend();
+loadStats();
+loadHistory();
 
-      const data = await safeFetch(API_BASE + "/analyze-image", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!data) return;
-
-      renderResult(data);
-      loadHistory();
-      loadStats();
-    }
-
-    async function analyzeQR() {
-      const fileInput = document.getElementById("qrInput");
-      const file = fileInput.files[0];
-
-      if (!file) {
-        alert("Please select a QR image first");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const data = await safeFetch(API_BASE + "/analyze-qr", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!data) return;
-
-      renderResult(data);
-      loadHistory();
-      loadStats();
-    }
-
-    function renderResult(data) {
-      if (data.error) {
-        alert(data.error);
-        return;
-      }
-
-      const resultBox = document.getElementById("result");
-      resultBox.style.display = "block";
-
-      document.getElementById("mode").innerText = data.mode || "TEXT_ANALYSIS";
-
-      const level = document.getElementById("level");
-      level.innerText = data.level;
-      level.className = "score";
-
-      if (data.level === "HIGH RISK") {
-        level.classList.add("high");
-      } else if (data.level === "SUSPICIOUS") {
-        level.classList.add("suspicious");
-      } else {
-        level.classList.add("low");
-      }
-
-      document.getElementById("score").innerText = data.score + "/100";
-      document.getElementById("explanation").innerText = data.explanation;
-      document.getElementById("recommendation").innerText = data.recommendation;
-
-      const flagsList = document.getElementById("flags");
-      flagsList.innerHTML = "";
-
-      const redFlags = data.red_flags || [];
-
-      redFlags.forEach(function(flag) {
-        const li = document.createElement("li");
-        li.innerText = flag;
-        flagsList.appendChild(li);
-      });
-
-      if (data.attack_summary) {
-        document.getElementById("attackType").innerText =
-          data.attack_summary.attack_type || "Unknown";
-
-        document.getElementById("attackerGoal").innerText =
-          data.attack_summary.attacker_goal || "Unknown";
-
-        document.getElementById("userRisk").innerText =
-          data.attack_summary.user_risk || "Unknown";
-
-        document.getElementById("confidence").innerText =
-          data.attack_summary.confidence || "Unknown";
-      }
-
-      const domainBox = document.getElementById("domainBox");
-
-      if (data.domain_info) {
-        domainBox.style.display = "block";
-
-        document.getElementById("diDomain").innerText =
-          data.domain_info.domain || "Unknown";
-
-        document.getElementById("diRegistrar").innerText =
-          data.domain_info.registrar || "Unknown";
-
-        document.getElementById("diCountry").innerText =
-          data.domain_info.country || "Unknown";
-
-        document.getElementById("diCreated").innerText =
-          data.domain_info.created_date || "Unknown";
-
-        document.getElementById("diExpiry").innerText =
-          data.domain_info.expiry_date || "Unknown";
-
-        const ageDays = data.domain_info.domain_age_days;
-
-        if (ageDays !== null && ageDays !== undefined) {
-          document.getElementById("diAge").innerText =
-            data.domain_info.domain_age_label + " (" + ageDays + " days)";
-        } else {
-          document.getElementById("diAge").innerText =
-            data.domain_info.domain_age_label || "Unknown";
-        }
-
-      } else {
-        domainBox.style.display = "none";
-      }
-
-      const qrBox = document.getElementById("qrBox");
-      const qrData = document.getElementById("qrData");
-
-      if (data.qr_data) {
-        qrBox.style.display = "block";
-        qrData.innerText = data.qr_data.join("\n");
-      } else {
-        qrBox.style.display = "none";
-        qrData.innerText = "";
-      }
-
-      const extractedBox = document.getElementById("extractedBox");
-      const extractedText = document.getElementById("extractedText");
-
-      if (data.extracted_text) {
-        extractedBox.style.display = "block";
-        extractedText.innerText = data.extracted_text;
-      } else {
-        extractedBox.style.display = "none";
-        extractedText.innerText = "";
-      }
-    }
-
-    async function loadHistory() {
-      const history = await safeFetch(API_BASE + "/history");
-
-      if (!history) return;
-
-      const historyBox = document.getElementById("history");
-      historyBox.innerHTML = "";
-
-      if (!history.length) {
-        historyBox.innerHTML = "<p class='brand'>No scans yet.</p>";
-        return;
-      }
-
-      history.forEach(function(item) {
-        const div = document.createElement("div");
-        div.className = "history-item";
-
-        let levelClass = "low";
-
-        if (item.level === "HIGH RISK") {
-          levelClass = "high";
-        } else if (item.level === "SUSPICIOUS") {
-          levelClass = "suspicious";
-        }
-
-        div.innerHTML =
-          '<div class="history-top">' +
-            '<span class="history-level ' + levelClass + '">' + item.level + '</span>' +
-            '<span>' + item.score + '/100</span>' +
-          '</div>' +
-          '<div class="history-input">' + item.input + '</div>' +
-          '<div class="history-meta">' + item.mode + ' • ' + item.timestamp + '</div>' +
-          '<p>' + item.explanation + '</p>';
-
-        historyBox.appendChild(div);
-      });
-    }
-
-    async function loadStats() {
-      const stats = await safeFetch(API_BASE + "/stats");
-
-      if (!stats) return;
-
-      document.getElementById("totalScans").innerText = stats.total_scans;
-      document.getElementById("highRisk").innerText = stats.high_risk;
-      document.getElementById("suspicious").innerText = stats.suspicious;
-      document.getElementById("lowRisk").innerText = stats.low_risk;
-
-      const latestActivity = document.getElementById("latestActivity");
-
-      if (stats.latest_scan) {
-        latestActivity.innerHTML =
-            "<b>" +
-            stats.latest_scan.level +
-            "</b> &bull; " +
-            stats.latest_scan.mode +
-            "<br><br>" +
-            stats.latest_scan.input;
-      } else {
-        latestActivity.innerText = "No scans yet.";
-      }
-    }
-
-    loadHistory();
-    loadStats();
-  </script>
+</script>
 
 </body>
 </html>

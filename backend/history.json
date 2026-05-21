@@ -1,90 +1,10 @@
 [
   {
-    "timestamp": "2026-05-21 06:32:19",
+    "timestamp": "2026-05-21 06:53:03",
     "input": "http://bit.ly/free-gift-card-login",
     "mode": "UNKNOWN",
     "score": 55,
     "level": "SUSPICIOUS",
     "explanation": "VirusTotal: 0 malicious, 0 suspicious detections."
-  },
-  {
-    "timestamp": "2026-05-14 12:13:16",
-    "input": "http://bit.ly/free-gift-card-login",
-    "mode": "UNKNOWN",
-    "score": 90,
-    "level": "UNKNOWN",
-    "explanation": ""
-  },
-  {
-    "timestamp": "2026-05-14 12:12:58",
-    "input": "http://bit.ly/free-gift-card-login",
-    "mode": "UNKNOWN",
-    "score": 55,
-    "level": "UNKNOWN",
-    "explanation": ""
-  },
-  {
-    "timestamp": "2026-05-14 11:56:39",
-    "input": "http://bit.ly/free-gift-card-login",
-    "mode": "URL_ANALYSIS",
-    "score": 0,
-    "level": "LOW RISK",
-    "explanation": "bit.ly does not show strong suspicious URL patterns in this scan. However, reputation can change, so unknown links should still be handled carefully."
-  },
-  {
-    "timestamp": "2026-05-14 11:56:05",
-    "input": "google.com\n",
-    "mode": "TEXT_ANALYSIS",
-    "score": 0,
-    "level": "LOW RISK",
-    "explanation": "This message does not show strong phishing behavior in the current rule-based analysis. Still verify unknown senders before clicking links."
-  },
-  {
-    "timestamp": "2026-05-14 11:46:34",
-    "input": "https://www.google.com",
-    "mode": "URL_ANALYSIS",
-    "score": 0,
-    "level": "LOW RISK",
-    "explanation": "google.com does not show strong suspicious URL patterns in this scan. However, reputation can change, so unknown links should still be handled carefully."
-  },
-  {
-    "timestamp": "2026-05-14 11:44:50",
-    "input": "https://google.com\n",
-    "mode": "URL_ANALYSIS",
-    "score": 0,
-    "level": "LOW RISK",
-    "explanation": "google.com does not show strong suspicious URL patterns in this scan. However, reputation can change, so unknown links should still be handled carefully."
-  },
-  {
-    "timestamp": "2026-05-14 11:42:18",
-    "input": "http://bit.ly/free-gift-card-login",
-    "mode": "URL_ANALYSIS",
-    "score": 0,
-    "level": "LOW RISK",
-    "explanation": "bit.ly does not show strong suspicious URL patterns in this scan. However, reputation can change, so unknown links should still be handled carefully."
-  },
-  {
-    "timestamp": "2026-05-14 11:40:31",
-    "input": "http://bit.ly/free-gift-card-login",
-    "mode": "URL_ANALYSIS",
-    "score": 0,
-    "level": "LOW RISK",
-    "explanation": "bit.ly does not show strong suspicious URL patterns in this scan. However, reputation can change, so unknown links should still be handled carefully."
-  },
-  {
-    "timestamp": "2026-05-14 11:20:53",
-    "input": "http://bit.ly/free-gift-card-login",
-    "mode": "URL_ANALYSIS",
-    "score": 0,
-    "level": "LOW RISK",
-    "explanation": "bit.ly does not show strong suspicious URL patterns in this scan. However, reputation can change, so unknown links should still be handled carefully."
-  },
-  {
-    "timestamp": "2026-05-14 11:19:44",
-    "input": "http://paypal-security-login.verify-account-example.com",
-    "mode": "URL_ANALYSIS",
-    "score": 89,
-    "level": "HIGH RISK",
-    "explanation": "paypal-security-login.verify-account-example.com shows multiple signs commonly seen in phishing infrastructure. The domain structure, naming pattern, domain intelligence, or live reputation data suggests it may be used for impersonation, credential theft, or unsafe redirection."
   }
 ]
