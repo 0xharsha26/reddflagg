@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from analyzer import analyze_input
 from qr_analyzer import extract_qr_data
 
@@ -12,6 +14,7 @@ from datetime import datetime
 
 
 app = FastAPI(title="REDDFLAGG API")
+app.mount("/static", StaticFiles(directory="../frontend"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -78,11 +81,8 @@ def generate_stats(history):
 
 
 @app.get("/")
-def home():
-    return {
-        "message": "REDDFLAGG backend is running",
-        "status": "connected"
-    }
+def root():
+    return FileResponse("../frontend/index.html")
 
 
 @app.get("/health")
