@@ -1,14 +1,29 @@
-from pyzbar.pyzbar import decode
+import cv2
+import numpy as np
 from PIL import Image
 
 
-def extract_qr_data(image: Image.Image):
-    decoded_objects = decode(image)
+def extract_qr_data(image_path):
+    try:
+        image = cv2.imread(image_path)
 
-    results = []
+        detector = cv2.QRCodeDetector()
 
-    for obj in decoded_objects:
-        data = obj.data.decode("utf-8")
-        results.append(data)
+        data, bbox, _ = detector.detectAndDecode(image)
 
-    return results
+        if data:
+            return {
+                "success": True,
+                "data": data
+            }
+
+        return {
+            "success": False,
+            "message": "No QR code found"
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
