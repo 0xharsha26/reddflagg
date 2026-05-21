@@ -1,10 +1,1 @@
-[
-  {
-    "timestamp": "2026-05-21 06:53:03",
-    "input": "http://bit.ly/free-gift-card-login",
-    "mode": "UNKNOWN",
-    "score": 55,
-    "level": "SUSPICIOUS",
-    "explanation": "VirusTotal: 0 malicious, 0 suspicious detections."
-  }
-]
+[]
