@@ -1351,13 +1351,13 @@ async function loadHistory() {
     element.className = "history-item";
     element.innerHTML = `
       <div class="history-top">
-        <span class="${badgeClass}">${item.level}</span>
-        <span class="history-score">Score: ${item.score}/100</span>
+        <span class="${badgeClass}">${item.level || "LOW RISK"}</span>
+        <span class="history-score">Score: ${item.score !== undefined ? item.score : 0}/100</span>
       </div>
-      <div class="history-input">${escapeHtml(item.input)}</div>
+      <div class="history-input">${escapeHtml(item.input || "")}</div>
       <div class="history-bottom">
-        <span class="history-mode">${item.mode.replace('_', ' ')}</span>
-        <span>${item.timestamp}</span>
+        <span class="history-mode">${(item.mode || "TEXT_ANALYSIS").replace('_', ' ')}</span>
+        <span>${item.timestamp || ""}</span>
       </div>
     `;
     historyBox.appendChild(element);
