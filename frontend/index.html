@@ -989,13 +989,18 @@ function getApiBase() {
   const host = window.location.hostname;
   const origin = window.location.origin;
 
-  if (host === "127.0.0.1" || host === "localhost") {
+  // Local file system double-click fallback
+  if (origin === "null" || !host) {
     return "http://127.0.0.1:8000";
   }
+  
+  // Codespaces environment port redirection
   if (origin.includes(".app.github.dev")) {
     return origin.replace("-5500", "-8000");
   }
-  return "http://127.0.0.1:8000";
+  
+  // Return the origin that served the HTML (works for localhost:8000 and Render!)
+  return origin;
 }
 
 const API_BASE = getApiBase();
