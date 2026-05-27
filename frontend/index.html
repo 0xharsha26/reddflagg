@@ -3,745 +3,1405 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REDDFLAGG | Multi-Mode Threat Intelligence Console</title>
+<link rel="icon" type="image/png" href="favicon.ico" />
 
-<title>REDDFLAGG</title>
-
-<link
-  rel="icon"
-  type="image/png"
-  href="favicon.ico"
-/>
+<!-- Google Fonts Outfit & JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+:root {
+  --bg-primary: #06070d;
+  --bg-secondary: #0d0f1a;
+  --bg-card: rgba(17, 20, 38, 0.7);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(255, 23, 23, 0.15);
+  
+  --color-danger: #ff334b;
+  --color-warning: #ffb020;
+  --color-success: #10b981;
+  --color-info: #3b82f6;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  
+  --accent: #ff1f1f;
+  --accent-glow: rgba(255, 31, 31, 0.4);
 }
 
-body{
-  background:#07070a;
-  color:white;
-  font-family:Arial, sans-serif;
-  padding:20px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', sans-serif;
+  transition: background-color 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
 }
 
-.container{
-  max-width:1100px;
-  margin:auto;
+body {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(26, 21, 59, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(255, 31, 31, 0.06) 0%, transparent 40%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  padding: 20px;
+  min-height: 100vh;
 }
 
-.brand{
-  color:#ff1717;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.card{
-  background:#12172c;
-  border-radius:18px;
-  padding:20px;
-  margin-top:20px;
-  border:1px solid rgba(255,255,255,0.08);
+.container {
+  max-width: 1300px;
+  margin: auto;
 }
 
-textarea{
-  width:100%;
-  min-height:140px;
-  background:#202836;
-  border:none;
-  color:white;
-  padding:15px;
-  border-radius:12px;
-  resize:none;
-  margin-top:15px;
+/* Header & Connection Glow */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-button{
-  padding:12px 18px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  margin-top:15px;
-  font-weight:bold;
+.brand {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
-.primary-btn{
-  background:#ff1717;
-  color:white;
+.brand span {
+  color: var(--accent);
+  text-shadow: 0 0 15px var(--accent-glow);
 }
 
-.secondary-btn{
-  background:#491111;
-  color:#ff1717;
+.connection-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  padding: 8px 14px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
-.stats-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-  margin-top:20px;
+.connection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-muted);
 }
 
-.stat-box{
-  background:#1e2941;
-  padding:18px;
-  border-radius:14px;
+.connected .connection-dot {
+  background-color: var(--color-success);
+  box-shadow: 0 0 10px var(--color-success);
+  animation: pulse 2s infinite;
 }
 
-.stat-title{
-  opacity:0.7;
-  font-size:14px;
+.offline .connection-dot {
+  background-color: var(--color-danger);
+  box-shadow: 0 0 10px var(--color-danger);
+  animation: pulse 1.5s infinite;
 }
 
-.stat-value{
-  font-size:30px;
-  margin-top:8px;
-  font-weight:bold;
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.6; }
 }
 
-.result{
-  margin-top:20px;
+/* Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 25px;
+  align-items: start;
 }
 
-.result-level{
-  font-size:28px;
-  font-weight:bold;
+@media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.high{
-  color:#d32444;
+/* Cards & Glassmorphism */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  margin-bottom: 25px;
 }
 
-.suspicious{
-  color:#fcc64a;
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.low{
-  color:#2ed46b;
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-primary);
 }
 
-.flag{
-  background:#0f172a;
-  padding:10px;
-  border-radius:10px;
-  margin-top:10px;
+.card-title svg {
+  color: var(--accent);
 }
 
-.history-item{
-  background:#0f172a;
-  padding:15px;
-  border-radius:12px;
-  margin-top:12px;
+/* Visual Tabs Navigation */
+.tabs-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
 }
 
-.history-top{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:10px;
+.tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 10px 5px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
 
-.history-level{
-  font-weight:bold;
+.tab-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
-.history-input{
-  margin-top:10px;
-  word-break:break-word;
+.tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
 }
 
-.history-meta{
-  opacity:0.7;
-  margin-top:10px;
-  font-size:14px;
+.tab-btn.active {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.connection{
-  margin-top:10px;
-  font-size:14px;
+/* Input Styles */
+.tab-content {
+  display: none;
 }
 
-.connected{
-  color:#4ade80;
+.tab-content.active {
+  display: block;
 }
 
-.offline{
-  color:#d32444;
+textarea {
+  width: 100%;
+  min-height: 160px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 16px;
+  border-radius: 12px;
+  resize: none;
+  font-size: 15px;
+  line-height: 1.5;
+  outline: none;
 }
 
-.loading{
-  opacity:0.7;
-  margin-top:10px;
+textarea:focus {
+  border-color: rgba(255, 31, 31, 0.4);
+  box-shadow: 0 0 10px rgba(255, 31, 31, 0.1);
 }
 
-.upload-box{
-  margin-top:15px;
+/* Upload Container */
+.upload-zone {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: 30px 20px;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.1);
 }
 
-input[type="file"]{
-  margin-top:10px;
+.upload-zone:hover {
+  border-color: rgba(255, 31, 31, 0.4);
+  background: rgba(255, 31, 31, 0.02);
 }
 
-.action-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+.upload-zone svg {
+  width: 40px;
+  height: 40px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
 }
 
+.upload-zone p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.upload-zone span {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.file-preview {
+  margin-top: 15px;
+  font-size: 13px;
+  color: var(--color-success);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.08);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+/* Buttons */
+.btn-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 15px var(--accent-glow);
+  flex: 1;
+}
+
+.btn-primary:hover {
+  background: #ff3c3c;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(255, 31, 31, 0.5);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+/* Loading Panel */
+.loading-box {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid rgba(255, 31, 31, 0.1);
+  border-left-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 18px;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Empty State Results */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty-state svg {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 20px;
+  color: rgba(255, 255, 255, 0.05);
+}
+
+.empty-state h3 {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+/* Results Content */
+#resultContainer {
+  display: none;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.badge {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.badge-high {
+  background: rgba(255, 51, 75, 0.12);
+  color: var(--color-danger);
+  border: 1px solid rgba(255, 51, 75, 0.2);
+}
+
+.badge-suspicious {
+  background: rgba(255, 176, 32, 0.12);
+  color: var(--color-warning);
+  border: 1px solid rgba(255, 176, 32, 0.2);
+}
+
+.badge-safe {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--color-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Circular Threat Meter */
+.threat-meter-box {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.threat-ring-container {
+  position: relative;
+  width: 76px;
+  height: 76px;
+}
+
+.threat-ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 8px;
+}
+
+.threat-ring-bar {
+  fill: none;
+  stroke-width: 8px;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  stroke-dasharray: 213.6;
+  stroke-dashoffset: 213.6;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.threat-meter-details p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.threat-meter-details h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+/* WHOIS Intelligence Card */
+.whois-card {
+  display: none;
+  background: rgba(59, 130, 246, 0.03);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.whois-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-info);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.whois-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.whois-item {
+  font-size: 13px;
+}
+
+.whois-label {
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.whois-value {
+  color: var(--text-primary);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.whois-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+/* Attacker Intent / Threat Summary */
+.intent-card {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-color);
+}
+
+.intent-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.intent-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.intent-row:last-child {
+  margin-bottom: 0;
+}
+
+.intent-label {
+  color: var(--text-muted);
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.intent-value {
+  color: var(--text-primary);
+}
+
+/* Red Flags list */
+.flags-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.flag-item {
+  background: rgba(255, 51, 75, 0.03);
+  border-left: 3px solid var(--color-danger);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.flag-item-safe {
+  border-left-color: var(--color-success);
+  background: rgba(16, 185, 129, 0.03);
+}
+
+/* Analytics Stats Dashboard */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+@media (max-width: 650px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-box {
+  background: var(--bg-card);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 18px 14px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.stat-title {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.stat-value.danger { color: var(--color-danger); }
+.stat-value.warning { color: var(--color-warning); }
+.stat-value.success { color: var(--color-success); }
+
+/* Scan History Items */
+.history-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.history-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 12px;
+}
+
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.history-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.history-score {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.history-input {
+  font-size: 13px;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+  word-break: break-all;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.history-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.history-mode {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
 </style>
 </head>
-
 <body>
 
 <div class="container">
-
-<h1>
-<span class="brand">REDD</span>FLAGG
-</h1>
-
-<div id="connectionStatus" class="connection">
-Checking backend...
-</div>
-
-<div class="card">
-
-<h2>Threat Analyzer</h2>
-
-<textarea
-id="inputText"
-placeholder="Paste suspicious message, email, URL, or phishing text..."
-></textarea>
-
-<div class="action-row">
-
-<button
-class="primary-btn"
-onclick="analyzeText()"
->
-Analyze
-</button>
-
-<button
-class="secondary-btn"
-id="refreshBtn"
-onclick="refreshAnalytics()"
->
-Reset Analytics
-</button>
-
-</div>
-
-<div class="upload-box">
-
-<h3 style="margin-top:20px;">
-Image Analysis
-</h3>
-
-<input
-type="file"
-id="imageUpload"
-accept="image/*"
-/>
-
-<button
-class="secondary-btn"
-onclick="analyzeImage()"
->
-Analyze Image
-</button>
-
-</div>
-
-<div class="upload-box">
-
-<h3 style="margin-top:20px;">
-QR Analysis
-</h3>
-
-<input
-type="file"
-id="qrUpload"
-accept="image/*"
-/>
-
-<button
-class="secondary-btn"
-onclick="analyzeQR()"
->
-Analyze QR
-</button>
-
-</div>
-
-<div id="loading" class="loading"></div>
-
-<div id="result" class="result"></div>
-
-</div>
-
-<div class="card">
-
-<h2>Analytics</h2>
-
-<div class="stats-grid">
-
-<div class="stat-box">
-<div class="stat-title">Total Scans</div>
-<div class="stat-value" id="totalScans">0</div>
-</div>
-
-<div class="stat-box">
-<div class="stat-title">High Risk</div>
-<div class="stat-value high" id="highRisk">0</div>
-</div>
-
-<div class="stat-box">
-<div class="stat-title">Suspicious</div>
-<div class="stat-value suspicious" id="suspiciousCount">0</div>
-</div>
-
-<div class="stat-box">
-<div class="stat-title">Low Risk</div>
-<div class="stat-value low" id="lowRisk">0</div>
-</div>
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>Recent Scans</h2>
-
-<div id="history">
-<p class="brand">Loading history...</p>
-</div>
-
-</div>
+  
+  <!-- Navigation Header -->
+  <header>
+    <div class="brand">
+      <span>REDD</span>FLAGG
+    </div>
+    
+    <div id="connectionStatus" class="connection-pill offline">
+      <div class="connection-dot"></div>
+      <span id="connectionText">Checking Node...</span>
+    </div>
+  </header>
+  
+  <div class="dashboard-grid">
+    
+    <!-- LEFT PANEL: Console Input -->
+    <div>
+      <div class="card">
+        <div class="card-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          Security Scan Console
+        </div>
+        
+        <!-- Interactive Mode Tabs -->
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="switchTab('text-tab')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Text
+          </button>
+          
+          <button class="tab-btn" onclick="switchTab('url-tab')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            URL
+          </button>
+          
+          <button class="tab-btn" onclick="switchTab('image-tab')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Image OCR
+          </button>
+          
+          <button class="tab-btn" onclick="switchTab('qr-tab')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            QR Code
+          </button>
+        </div>
+        
+        <!-- Tab: Text -->
+        <div id="text-tab" class="tab-content active">
+          <textarea id="inputText" placeholder="Paste copy from a suspicious message, phishing email, SMS, or raw phishing narrative..."></textarea>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="analyzeText()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              Scan Text
+            </button>
+          </div>
+        </div>
+        
+        <!-- Tab: URL -->
+        <div id="url-tab" class="tab-content">
+          <textarea id="inputUrl" placeholder="Enter target domain or suspicious link (e.g., https://paypal-secure-verify.net/signin)..." style="min-height: 80px;"></textarea>
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="analyzeUrl()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              Scan URL
+            </button>
+          </div>
+        </div>
+        
+        <!-- Tab: Image OCR -->
+        <div id="image-tab" class="tab-content">
+          <div class="upload-zone" onclick="document.getElementById('imageUpload').click()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <p>Upload a screenshot of the message or page</p>
+            <span>Supports JPG, PNG formats. Text will be parsed automatically.</span>
+            <div id="imagePreview" class="file-preview"></div>
+          </div>
+          <input type="file" id="imageUpload" accept="image/*" onchange="showPreview('imageUpload', 'imagePreview')" />
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="analyzeImage()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              Extract & Scan Image
+            </button>
+          </div>
+        </div>
+        
+        <!-- Tab: QR Decoder -->
+        <div id="qr-tab" class="tab-content">
+          <div class="upload-zone" onclick="document.getElementById('qrUpload').click()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/></svg>
+            <p>Upload image containing a QR code</p>
+            <span>Will decode embedded links/data and run threat checks.</span>
+            <div id="qrPreview" class="file-preview"></div>
+          </div>
+          <input type="file" id="qrUpload" accept="image/*" onchange="showPreview('qrUpload', 'qrPreview')" />
+          <div class="btn-group">
+            <button class="btn btn-primary" onclick="analyzeQR()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              Decode & Scan QR
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- RIGHT PANEL: Live Results Output -->
+    <div>
+      <div class="card" style="min-height: 420px; display: flex; flex-direction: column;">
+        <div class="card-title">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Scan Report Console
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loading" class="loading-box">
+          <div class="spinner"></div>
+          <h4 id="loadingText" style="font-size: 15px; color: var(--text-secondary);">Analyzing parameters...</h4>
+        </div>
+        
+        <!-- Idle / Empty State -->
+        <div id="emptyResult" class="empty-state">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <h3>Console Ready</h3>
+          <p style="font-size: 13px;">Upload or paste data and run scan to generate threat score report.</p>
+        </div>
+        
+        <!-- Result Report Output -->
+        <div id="resultContainer">
+          <div class="result-header">
+            <span class="badge" id="resultBadge">LOW RISK</span>
+            <span style="font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;" id="scanTimestamp">2026-05-27 15:22:21</span>
+          </div>
+          
+          <!-- Score gauge metrics -->
+          <div class="threat-meter-box">
+            <div class="threat-ring-container">
+              <svg width="76" height="76">
+                <circle class="threat-ring-bg" cx="38" cy="38" r="34"></circle>
+                <circle class="threat-ring-bar" id="scoreBar" cx="38" cy="38" r="34"></circle>
+              </svg>
+              <div class="score-text" id="scoreNumber">0</div>
+            </div>
+            <div class="threat-meter-details">
+              <h4 id="riskSummaryTitle">Safe Result</h4>
+              <p id="riskRecommendationText">No obvious threat vectors detected.</p>
+            </div>
+          </div>
+          
+          <!-- Domain WHOIS Registry intelligence display -->
+          <div class="whois-card" id="whoisCard">
+            <div class="whois-title">
+              <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+              Domain WHOIS Intelligence
+            </div>
+            <div class="whois-grid">
+              <div class="whois-item">
+                <div class="whois-label">Registrant Domain</div>
+                <div class="whois-value" id="whoisDomain">Unknown</div>
+              </div>
+              <div class="whois-item">
+                <div class="whois-label">Registrar</div>
+                <div class="whois-value" id="whoisRegistrar">Unknown</div>
+              </div>
+              <div class="whois-item">
+                <div class="whois-label">Created Date</div>
+                <div class="whois-value" id="whoisCreated">Unknown</div>
+              </div>
+              <div class="whois-item">
+                <div class="whois-label">Expiration</div>
+                <div class="whois-value" id="whoisExpiry">Unknown</div>
+              </div>
+              <div class="whois-item" style="grid-column: span 2;">
+                <div class="whois-label">Domain Registry Age</div>
+                <div class="whois-value" id="whoisAge">Unknown</div>
+                <div id="whoisAgeBadge" class="whois-badge">Unknown</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Attacker parameters summary -->
+          <div class="intent-card">
+            <div class="intent-header">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              Attacker Parameter Profiles
+            </div>
+            <div class="intent-row">
+              <div class="intent-label">Threat Class</div>
+              <div class="intent-value" id="intentClass">-</div>
+            </div>
+            <div class="intent-row">
+              <div class="intent-label">Expected Goal</div>
+              <div class="intent-value" id="intentGoal">-</div>
+            </div>
+            <div class="intent-row">
+              <div class="intent-label">Threat Context</div>
+              <div class="intent-value" id="intentContext">-</div>
+            </div>
+            <div class="intent-row">
+              <div class="intent-label">Certainty</div>
+              <div class="intent-value" id="intentCertainty" style="font-weight:700;">-</div>
+            </div>
+          </div>
+          
+          <!-- Detailed Red Flags List -->
+          <div>
+            <div class="flags-title" id="flagsListTitle">Local Red Flags Hit</div>
+            <div id="flagsContainer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <!-- ROW 2: Analytics Stats Console -->
+  <div class="card" style="margin-top: 5px;">
+    <div class="card-title" style="margin-bottom:15px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      Operational Scan Analytics
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-title">Aggregated Scans</div>
+        <div class="stat-value" id="totalScans">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-title">Critical Threats</div>
+        <div class="stat-value danger" id="highRisk">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-title">Suspicious Logs</div>
+        <div class="stat-value warning" id="suspiciousCount">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-title">Safe Clearances</div>
+        <div class="stat-value success" id="lowRisk">0</div>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 10px;">
+      <button class="btn btn-secondary" onclick="refreshAnalytics()" style="padding: 10px 16px; font-size: 12px;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        Reset Security Logs
+      </button>
+    </div>
+  </div>
+  
+  <!-- ROW 3: Scan Audit Trail History -->
+  <div class="card">
+    <div class="card-title">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      Security Scan Audit Feed
+    </div>
+    
+    <div id="history" class="history-list">
+      <p style="color: var(--text-muted); font-size: 13px;">Reading historical feeds...</p>
+    </div>
+  </div>
 
 </div>
 
 <script>
-
+// Detect appropriate API base
 function getApiBase() {
-
   const host = window.location.hostname;
   const origin = window.location.origin;
 
-  if (
-    host === "127.0.0.1" ||
-    host === "localhost"
-  ) {
+  if (host === "127.0.0.1" || host === "localhost") {
     return "http://127.0.0.1:8000";
   }
-
-  if (
-    origin.includes(".app.github.dev")
-  ) {
+  if (origin.includes(".app.github.dev")) {
     return origin.replace("-5500", "-8000");
   }
-
   return "http://127.0.0.1:8000";
 }
 
 const API_BASE = getApiBase();
 
+// Handle tab switching
+let activeTabId = 'text-tab';
+function switchTab(tabId) {
+  activeTabId = tabId;
+  
+  // Update tabs active button state
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  tabButtons.forEach(btn => btn.classList.remove('active'));
+  
+  // Set matching active tab button
+  let buttonIndex = 0;
+  if (tabId === 'url-tab') buttonIndex = 1;
+  else if (tabId === 'image-tab') buttonIndex = 2;
+  else if (tabId === 'qr-tab') buttonIndex = 3;
+  tabButtons[buttonIndex].classList.add('active');
+  
+  // Update content divs active class
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+// Display selected file preview in UI upload zones
+function showPreview(inputId, previewId) {
+  const file = document.getElementById(inputId).files[0];
+  const preview = document.getElementById(previewId);
+  if (file) {
+    preview.style.display = 'inline-flex';
+    preview.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Selected: ${file.name}`;
+  } else {
+    preview.style.display = 'none';
+  }
+}
+
+// Global robust API fetch wrapper
 async function safeFetch(url, options = {}) {
-
   try {
-
     const response = await fetch(url, options);
-
     if (!response.ok) {
-      throw new Error(
-        "Request failed"
-      );
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.error || "Endpoint connection failed.");
     }
-
     return await response.json();
-
   } catch (error) {
-
-    console.error(error);
-
+    console.error("Fetch Exception: ", error);
+    showNotification(error.message || "Failed connecting to backend service.", "danger");
     return null;
   }
 }
 
+// Ping API node healthcheck
 async function checkBackend() {
+  const statusBox = document.getElementById("connectionStatus");
+  const statusText = document.getElementById("connectionText");
+  const data = await safeFetch(API_BASE + "/health");
 
-  const statusBox =
-    document.getElementById(
-      "connectionStatus"
-    );
-
-  const data =
-    await safeFetch(
-      API_BASE + "/health"
-    );
-
-  if (data) {
-
-    statusBox.innerHTML =
-      "Backend Connected";
-
-    statusBox.className =
-      "connection connected";
-
+  if (data && data.status === "connected") {
+    statusBox.className = "connection-pill connected";
+    statusText.innerText = "ACTIVE NODE";
   } else {
-
-    statusBox.innerHTML =
-      "Backend Offline";
-
-    statusBox.className =
-      "connection offline";
+    statusBox.className = "connection-pill offline";
+    statusText.innerText = "NODE OFFLINE";
   }
 }
 
-function setLoading(text="") {
-
-  document.getElementById(
-    "loading"
-  ).innerText = text;
+// Display UI scan loading states
+function setLoading(show, text = "Processing parameters...") {
+  const loading = document.getElementById("loading");
+  const empty = document.getElementById("emptyResult");
+  const result = document.getElementById("resultContainer");
+  const loadingText = document.getElementById("loadingText");
+  
+  if (show) {
+    loadingText.innerText = text;
+    loading.style.display = "flex";
+    empty.style.display = "none";
+    result.style.display = "none";
+  } else {
+    loading.style.display = "none";
+  }
 }
 
+// Helper to draw the circular gauge threat meter stroke offsets
+// Circle radius = 34, Circumference = 2 * PI * 34 = 213.6
+function updateThreatGauge(score, level) {
+  const scoreBar = document.getElementById("scoreBar");
+  const scoreNumber = document.getElementById("scoreNumber");
+  
+  const circumference = 213.6;
+  const offset = circumference - (score / 100) * circumference;
+  scoreBar.style.strokeDashoffset = offset;
+  scoreNumber.innerText = score;
+  
+  // Set stroke color matching risk level
+  if (level === "HIGH RISK") {
+    scoreBar.style.stroke = "var(--color-danger)";
+  } else if (level === "SUSPICIOUS") {
+    scoreBar.style.stroke = "var(--color-warning)";
+  } else {
+    scoreBar.style.stroke = "var(--color-success)";
+  }
+}
+
+// Render analyzed scan report to console card
 function renderResult(data) {
-
-  const resultBox =
-    document.getElementById(
-      "result"
-    );
-
-  if (!data) {
-
-    resultBox.innerHTML =
-      "<p class='high'>Analysis failed.</p>";
-
+  const resultBox = document.getElementById("resultContainer");
+  const emptyBox = document.getElementById("emptyResult");
+  
+  if (!data || data.error) {
+    emptyBox.style.display = "flex";
+    resultBox.style.display = "none";
+    if (data && data.error) {
+      alert("Scan Failed: " + data.error);
+    }
     return;
   }
-
-  let levelClass = "low";
-
+  
+  emptyBox.style.display = "none";
+  resultBox.style.display = "block";
+  
+  // Set risk badge
+  const badge = document.getElementById("resultBadge");
+  badge.innerText = data.level;
+  
   if (data.level === "HIGH RISK") {
-    levelClass = "high";
+    badge.className = "badge badge-high";
+    document.getElementById("riskSummaryTitle").innerText = "CRITICAL THREAT THRESHOLD";
+  } else if (data.level === "SUSPICIOUS") {
+    badge.className = "badge badge-suspicious";
+    document.getElementById("riskSummaryTitle").innerText = "SUSPICIOUS INDICATORS IDENTIFIED";
+  } else {
+    badge.className = "badge badge-safe";
+    document.getElementById("riskSummaryTitle").innerText = "SECURITY SCAN CLEARANCE";
   }
-
-  else if (
-    data.level === "SUSPICIOUS"
-  ) {
-    levelClass = "suspicious";
+  
+  // Update timestamp & recommendation
+  document.getElementById("scanTimestamp").innerText = new Date().toISOString().replace('T', ' ').substring(0, 19);
+  document.getElementById("riskRecommendationText").innerText = data.recommendation || "No action required.";
+  
+  // Update gauge meter
+  updateThreatGauge(data.score, data.level);
+  
+  // Render WHOIS Domain card
+  const whoisCard = document.getElementById("whoisCard");
+  const dIntel = data.domain_intelligence;
+  
+  if (dIntel) {
+    whoisCard.style.display = "block";
+    document.getElementById("whoisDomain").innerText = dIntel.domain || "Unknown";
+    document.getElementById("whoisRegistrar").innerText = dIntel.registrar || "Unknown/Private";
+    document.getElementById("whoisCreated").innerText = dIntel.created_date || "Unknown";
+    document.getElementById("whoisExpiry").innerText = dIntel.expiry_date || "Unknown";
+    
+    const ageLabel = dIntel.domain_age_label || "Unknown";
+    const ageDays = dIntel.domain_age_days !== null ? `${dIntel.domain_age_days} days` : "Unknown";
+    document.getElementById("whoisAge").innerText = `${ageDays} (${ageLabel})`;
+    
+    const ageBadge = document.getElementById("whoisAgeBadge");
+    ageBadge.innerText = ageLabel.toUpperCase();
+    if (ageLabel === "Very New") {
+      ageBadge.style.background = "rgba(255, 51, 75, 0.15)";
+      ageBadge.style.color = "var(--color-danger)";
+    } else if (ageLabel === "New" || ageLabel === "Less than 1 year") {
+      ageBadge.style.background = "rgba(255, 176, 32, 0.15)";
+      ageBadge.style.color = "var(--color-warning)";
+    } else {
+      ageBadge.style.background = "rgba(16, 185, 129, 0.15)";
+      ageBadge.style.color = "var(--color-success)";
+    }
+  } else {
+    whoisCard.style.display = "none";
   }
-
-  let flagsHtml = "";
-
-  if (data.red_flags) {
-
-    data.red_flags.forEach(flag => {
-
-      flagsHtml +=
-        '<div class="flag">' +
-        flag +
-        '</div>';
+  
+  // Render Threat Parameter profiles
+  const summary = data.attack_summary || {};
+  document.getElementById("intentClass").innerText = summary.attack_type || "None Detected";
+  document.getElementById("intentGoal").innerText = summary.attacker_goal || "None Detected";
+  document.getElementById("intentContext").innerText = summary.user_risk || "None Detected";
+  
+  const certainty = document.getElementById("intentCertainty");
+  certainty.innerText = summary.confidence || "Low";
+  if (summary.confidence === "High") certainty.style.color = "var(--color-danger)";
+  else if (summary.confidence === "Medium") certainty.style.color = "var(--color-warning)";
+  else certainty.style.color = "var(--color-success)";
+  
+  // Render Red flags
+  const flagsContainer = document.getElementById("flagsContainer");
+  flagsContainer.innerHTML = "";
+  
+  const flags = data.red_flags || [];
+  if (flags.length === 0 || (flags.length === 1 && flags[0].includes("No obvious"))) {
+    flagsContainer.innerHTML = `
+      <div class="flag-item flag-item-safe">
+        No active threat markers were triggered in this scan sequence.
+      </div>
+    `;
+  } else {
+    flags.forEach(flag => {
+      const item = document.createElement("div");
+      item.className = "flag-item";
+      item.innerText = flag;
+      flagsContainer.appendChild(item);
     });
   }
-
-  resultBox.innerHTML =
-
-    '<div class="result-level ' +
-    levelClass +
-    '">' +
-    data.level +
-    '</div>' +
-
-    '<p style="margin-top:10px;">' +
-    'Threat Score: ' +
-    data.score +
-    '/100' +
-    '</p>' +
-
-    '<p style="margin-top:15px;">' +
-    data.explanation +
-    '</p>' +
-
-    '<h3 style="margin-top:20px;">' +
-    'Red Flags' +
-    '</h3>' +
-
-    flagsHtml;
 }
 
+// Action: Post raw text threat analysis
 async function analyzeText() {
-
-  const text =
-    document.getElementById(
-      "inputText"
-    ).value.trim();
-
+  const text = document.getElementById("inputText").value.trim();
   if (!text) {
-    alert("Enter some text.");
+    alert("Please input suspicious narrative copy to begin scan.");
     return;
   }
 
-  setLoading("Analyzing...");
-
-  const data = await safeFetch(
-    API_BASE + "/analyze",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        text:text
-      })
-    }
-  );
-
-  setLoading("");
-
+  setLoading(true, "Scanning narrative content...");
+  const data = await safeFetch(API_BASE + "/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: text })
+  });
+  
+  setLoading(false);
   renderResult(data);
-
   await loadStats();
   await loadHistory();
 }
 
+// Action: Post raw URL threat analysis
+async function analyzeUrl() {
+  const urlVal = document.getElementById("inputUrl").value.trim();
+  if (!urlVal) {
+    alert("Please input target domain link to begin URL scanner.");
+    return;
+  }
+
+  setLoading(true, "Decoding and checking WHOIS registry records...");
+  const data = await safeFetch(API_BASE + "/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: urlVal })
+  });
+  
+  setLoading(false);
+  renderResult(data);
+  await loadStats();
+  await loadHistory();
+}
+
+// Action: Post Image screenshot for OCR threat analysis
 async function analyzeImage() {
-
-  const file =
-    document.getElementById(
-      "imageUpload"
-    ).files[0];
-
+  const fileInput = document.getElementById("imageUpload");
+  const file = fileInput.files[0];
   if (!file) {
-    alert("Select image.");
+    alert("Please upload a screenshot file to read OCR text.");
     return;
   }
 
-  const formData =
-    new FormData();
+  const formData = new FormData();
+  formData.append("file", file);
 
-  formData.append(
-    "file",
-    file
-  );
+  setLoading(true, "Reading characters and searching phishing lures...");
+  const data = await safeFetch(API_BASE + "/analyze-image", {
+    method: "POST",
+    body: formData
+  });
 
-  setLoading(
-    "Scanning image..."
-  );
-
-  const data = await safeFetch(
-    API_BASE + "/analyze-image",
-    {
-      method:"POST",
-      body:formData
-    }
-  );
-
-  setLoading("");
-
+  setLoading(false);
   renderResult(data);
-
+  
+  // Clear input
+  fileInput.value = "";
+  document.getElementById("imagePreview").style.display = "none";
+  
   await loadStats();
   await loadHistory();
 }
 
+// Action: Post Image QR code decoder threat analysis
 async function analyzeQR() {
-
-  const file =
-    document.getElementById(
-      "qrUpload"
-    ).files[0];
-
+  const fileInput = document.getElementById("qrUpload");
+  const file = fileInput.files[0];
   if (!file) {
-    alert("Select QR image.");
+    alert("Please upload an image file containing a QR code.");
     return;
   }
 
-  const formData =
-    new FormData();
+  const formData = new FormData();
+  formData.append("file", file);
 
-  formData.append(
-    "file",
-    file
-  );
+  setLoading(true, "Decoding QR matrices and inspecting redirect channels...");
+  const data = await safeFetch(API_BASE + "/analyze-qr", {
+    method: "POST",
+    body: formData
+  });
 
-  setLoading(
-    "Scanning QR..."
-  );
-
-  const data = await safeFetch(
-    API_BASE + "/analyze-qr",
-    {
-      method:"POST",
-      body:formData
-    }
-  );
-
-  setLoading("");
-
+  setLoading(false);
   renderResult(data);
-
+  
+  // Clear input
+  fileInput.value = "";
+  document.getElementById("qrPreview").style.display = "none";
+  
   await loadStats();
   await loadHistory();
 }
 
+// Load backend metrics panel
 async function loadStats() {
-
-  const stats =
-    await safeFetch(
-      API_BASE + "/stats"
-    );
-
+  const stats = await safeFetch(API_BASE + "/stats");
   if (!stats) return;
 
-  document.getElementById(
-    "totalScans"
-  ).innerText =
-    stats.total_scans || 0;
-
-  document.getElementById(
-    "highRisk"
-  ).innerText =
-    stats.high_risk || 0;
-
-  document.getElementById(
-    "suspiciousCount"
-  ).innerText =
-    stats.suspicious || 0;
-
-  document.getElementById(
-    "lowRisk"
-  ).innerText =
-    stats.low_risk || 0;
+  document.getElementById("totalScans").innerText = stats.total_scans || 0;
+  
+  const hRisk = document.getElementById("highRisk");
+  hRisk.innerText = stats.high_risk || 0;
+  hRisk.className = stats.high_risk > 0 ? "stat-value danger" : "stat-value";
+  
+  const susp = document.getElementById("suspiciousCount");
+  susp.innerText = stats.suspicious || 0;
+  susp.className = stats.suspicious > 0 ? "stat-value warning" : "stat-value";
+  
+  const lRisk = document.getElementById("lowRisk");
+  lRisk.innerText = stats.low_risk || 0;
+  lRisk.className = stats.low_risk > 0 ? "stat-value success" : "stat-value";
 }
 
+// Load scan audits history feed
 async function loadHistory() {
-
-  const history =
-    await safeFetch(
-      API_BASE + "/history"
-    );
-
+  const history = await safeFetch(API_BASE + "/history");
   if (!history) return;
 
-  const historyBox =
-    document.getElementById(
-      "history"
-    );
-
+  const historyBox = document.getElementById("history");
   historyBox.innerHTML = "";
 
-  if (!history.length) {
-
-    historyBox.innerHTML =
-      "<p class='brand'>No scans yet.</p>";
-
+  if (history.length === 0) {
+    historyBox.innerHTML = `
+      <p style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0;">
+        No operational records logged in active audit database.
+      </p>
+    `;
     return;
   }
 
   history.forEach(item => {
-
-    let levelClass = "low";
-
-    if (item.level === "HIGH RISK") {
-      levelClass = "high";
-    }
-
-    else if (
-      item.level === "SUSPICIOUS"
-    ) {
-      levelClass = "suspicious";
-    }
-
-    const div =
-      document.createElement("div");
-
-    div.className =
-      "history-item";
-
-    div.innerHTML =
-
-      '<div class="history-top">' +
-
-      '<span class="history-level ' +
-      levelClass +
-      '">' +
-      item.level +
-      '</span>' +
-
-      '<span>' +
-      item.score +
-      '/100</span>' +
-
-      '</div>' +
-
-      '<div class="history-input">' +
-      item.input +
-      '</div>' +
-
-      '<div class="history-meta">' +
-      item.mode +
-      ' | ' +
-      item.timestamp +
-      '</div>' +
-
-      '<p style="margin-top:10px;">' +
-      item.explanation +
-      '</p>';
-
-    historyBox.appendChild(div);
+    let badgeClass = "history-badge badge-safe";
+    if (item.level === "HIGH RISK") badgeClass = "history-badge badge-high";
+    else if (item.level === "SUSPICIOUS") badgeClass = "history-badge badge-suspicious";
+    
+    const element = document.createElement("div");
+    element.className = "history-item";
+    element.innerHTML = `
+      <div class="history-top">
+        <span class="${badgeClass}">${item.level}</span>
+        <span class="history-score">Score: ${item.score}/100</span>
+      </div>
+      <div class="history-input">${escapeHtml(item.input)}</div>
+      <div class="history-bottom">
+        <span class="history-mode">${item.mode.replace('_', ' ')}</span>
+        <span>${item.timestamp}</span>
+      </div>
+    `;
+    historyBox.appendChild(element);
   });
 }
 
+// Reset operational database logs
 async function refreshAnalytics() {
-
-  const confirmReset =
-    confirm(
-      "Clear all analytics and history?"
-    );
-
+  const confirmReset = confirm("Clear operational database, reset metrics, and wipe historical logs?");
   if (!confirmReset) return;
 
-  try {
-
-    const response =
-      await fetch(
-        API_BASE + "/history",
-        {
-          method:"DELETE"
-        }
-      );
-
-    if (!response.ok) {
-      throw new Error(
-        "Reset failed"
-      );
-    }
-
+  const data = await safeFetch(API_BASE + "/history", { method: "DELETE" });
+  if (data) {
     await loadStats();
     await loadHistory();
-
-    document.getElementById(
-      "result"
-    ).innerHTML = "";
-
-    alert(
-      "Analytics reset successfully."
-    );
-
-  } catch(error) {
-
-    console.error(error);
-
-    alert(
-      "Failed to reset analytics."
-    );
+    document.getElementById("resultContainer").style.display = "none";
+    document.getElementById("emptyResult").style.display = "flex";
+    showNotification("Security metrics database successfully reset.", "success");
   }
 }
 
+// Notification alerts
+function showNotification(msg, type = "success") {
+  const textClr = type === "danger" ? "var(--color-danger)" : "var(--color-success)";
+  console.log(`%c[SYSTEM ALERT] ${msg}`, `color: ${textClr}; font-weight: bold;`);
+}
+
+// Escape HTML utility
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+// Initialize components
 checkBackend();
 loadStats();
 loadHistory();
 
+// Poll backend state every 10 seconds
+setInterval(checkBackend, 10000);
 </script>
 
 </body>
